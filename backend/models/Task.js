@@ -16,10 +16,10 @@ const TaskSchema = new mongoose.Schema(
       default: "Pending",
     },
     dueDate: { type: Date, required: true },
-    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, //[{type:String, required}]
+    assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], //[{type:String, required}] -array( allowed multiple ids)
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     mediaFile: [{ type: String }],
-    toDoList: [TodoSchema],
+    todoChecklist: [TodoSchema],
     progress: { type: Number, default: 0 },
   },
   { timestamps: true }
