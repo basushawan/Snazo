@@ -44,6 +44,8 @@ const App = () => {
                 element={<ViewTaskDetails />}
               />
             </Route>
+            {/* default route  */}
+            <Route path="/" element={<Root />} />
           </Routes>
         </Router>
       </div>
@@ -55,13 +57,14 @@ export default App;
 
 const Root = () => {
   const { user, loading } = React.useContext(UserContext);
+
   if (loading) <Outlet />;
   if (!user) {
-    <Navigate to="/login" />;
+    return <Navigate to="/login" />;
   }
-  return user.role === "admin" ? (
+  return user?.role === "admin" ? (
     <Navigate to="/admin/dashboard" />
   ) : (
-    <Navigate to="/userDashboard" />
+    <Navigate to="/user/dashboard" />
   );
 };

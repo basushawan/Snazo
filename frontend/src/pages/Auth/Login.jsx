@@ -12,7 +12,7 @@ const Login = () => {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState(null);
   const navigate = useNavigate();
-  const { updateUser } = UserContext();
+  const { updateUser } = React.useContext(UserContext);
 
   //Handle login form submit
   const handleLogin = async (e) => {
@@ -26,6 +26,7 @@ const Login = () => {
       return;
     }
     setError("");
+    
     //Login API Call
     try {
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
