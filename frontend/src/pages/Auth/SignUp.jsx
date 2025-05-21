@@ -1,21 +1,39 @@
 import React from "react";
 import AuthLayout from "../../components/layouts/AuthLayout";
 import { validateEmail } from "../../utils/helper";
-import ProfilePhotoSelector from "../../components/inputs/ProfilePhotoSelector";
+// import ProfilePhotoSelector from "../../components/inputs/ProfilePhotoSelector";
 import Input from "../../components/inputs/Input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
+import { UserContext } from "../../context/UserContext";
+import { toast } from "react-hot-toast";
+// import uploadImage from "../../utils/uploadImage";
 
 const SignUp = () => {
-  const [profilePic, setProfilePic] = React.useState(null);
+  // const [profilePic, setProfilePic] = React.useState(null);
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [adminInviteToken, setAdminInviteToken] = React.useState("");
   const [error, setError] = React.useState(null);
+  const { updateUser } = React.useContext(UserContext);
+  const navigate = useNavigate();
 
+  // Validation for AdminInviteToken
+  const handleTokenChange = (e) => {
+    const value = e.target.value;
+    if (/^\d{0,6}$/.test(value)) {
+      setAdminInviteToken(value);
+      setError(value.length === 6 ? "" : "Token must be exactly 6 digits");
+    } else {
+      setError("Only numeric characters allowed");
+    }
+  };
   //Handle singup form submit
   const handleSingUp = async (e) => {
     e.preventDefault();
+
     if (!fullName) {
       setError("Please enter fullname");
       return;
@@ -29,7 +47,26 @@ const SignUp = () => {
       return;
     }
     setError("");
+
+    try {
+      await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
+        name: fullName,
+        email,
+        password,
+        adminInviteToken,
+      });
+
+      toast.success("Signup successful. Please login to your account");
+      navigate("/login");
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("Something went wrong. Please try again");
+      }
+    }
   };
+
   return (
     <AuthLayout>
       <div className="lg:w-[100%]  h-auto  md:h-full mt-10 md:mt-0  flex flex-col justify-center">
@@ -39,7 +76,7 @@ const SignUp = () => {
         </p>
 
         <form onSubmit={handleSingUp}>
-          <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
+          {/* <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} /> */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               value={fullName}
@@ -67,10 +104,11 @@ const SignUp = () => {
             />
             <Input
               value={adminInviteToken}
-              onChange={({ target }) => setAdminInviteToken(target.value)}
+              onChange={handleTokenChange}
               label="Admin Invite Token"
               placeholder="6 Characters"
               type="password"
+              maxLength={6}
             />
           </div>
           {error && <p className="text-red-500 text-xs pb-2.5">{error}</p>}
