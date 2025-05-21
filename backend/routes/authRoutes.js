@@ -16,6 +16,6 @@ router.post("/register", registerUser); //Register
 router.post("/login", loginUser); //Login
 router.get("/profile", protect, getUserProfile); //Profile
 router.put("/profile", protect, updateUserProfile); //Update Profile
-router.post("/upload-image", upload.single("image"), uploadImage); //Upload Image
+router.post("/upload-image", protect, upload.single("image"), uploadImage); //Upload Image
 
 export default router;
