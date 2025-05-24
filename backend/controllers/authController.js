@@ -88,6 +88,22 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+// @desc Logout
+// @route POST /api/auth/login
+// @access Public
+export const logoutUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.tokenVersion += 1;
+    await user.save();
+    res.json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
 
 // @desc Profile
 // @route GET /api/auth/profile/
