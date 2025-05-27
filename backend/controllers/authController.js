@@ -16,8 +16,7 @@ const generateToken = (userId, tokenVersion) => {
 // @access Public
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, profileImageUrl, adminInviteToken } =
-      req.body;
+    const { name, email, password, adminInviteToken } = req.body;
 
     // if user exists
     const userExists = await User.findOne({ email: email });
@@ -34,12 +33,16 @@ export const registerUser = async (req, res) => {
     //Generate hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const defaultAvatar =
+      "https://api.dicebear.com/6.x/bottts-neutral/svg?seed=" +
+      encodeURIComponent(name);
+
     //Create a new user (db user)
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      profileImageUrl,
+      profileImageUrl: defaultAvatar,
       role,
     });
 
